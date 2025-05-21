@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Micro Store</title>
+    <style>
+      body {
+            font-family: sans-serif;
+            margin: 0;
+            background: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 15px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            padding: 10px 0;
+            background: #333;
+            color: white;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .product-display {
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .product-display img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: contain;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+
+        .product-display h2 {
+            font-size: 1.3em;
+            margin: 10px 0;
+            color: #007bff;
+        }
+
+        .product-display p.price {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #cart-area {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        #cart-area h3 {
+            margin-top: 0;
+            font-size: 1.1em;
+            color: #007bff;
+        }
+
+        #cart-area ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #cart-area li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 0.9em;
+        }
+
+        #cart-area li:last-child {
+            border-bottom: none;
+        }
+
+        #cart-area .total {
+            font-weight: bold;
+            font-size: 1.1em;
+            text-align: right;
+            margin-top: 10px;
+            color: #28a745;
+        }
+
+        #view-cart-btn {
+            margin-top: 10px;
+            background: #6c757d;
+        }
+
+        #view-cart-btn:hover {
+            background: #5a6268;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 10px;
+            text-align: center;
+            background: #333;
+            color: white;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Micro Store</h1>
+    </header>
+
+    <main class="container">
+        <div class="product-display">
+            <img src="https://via.placeholder.com/300x200?text=Awesome+Widget" alt="Awesome Widget">
+            <h2>Awesome Widget</h2>
+            <p class="price">$19.99</p>
+            <button id="add-to-cart-btn">Add to Cart</button>
+        </div>
+
+        <button id="view-cart-btn">View Cart</button>
+
+        <div id="cart-area" style="display: none;">
+            <h3>Your Cart</h3>
+            <ul id="cart-items">
+                </ul>
+            <p class="total">Total: <span id="cart-total">$0.00</span></p>
+            <button id="checkout-btn" style="background: #28a745;">Checkout</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Micro Store</p>
+    </footer>
+
+    <script>
+        const product = { id: 'w1', name: 'Awesome Widget', price: 19.99, image: 'https://via.placeholder.com/300x200?text=Awesome+Widget' };
+        let cart = JSON.parse(localStorage.getItem('microCart') || '[]');
+
+        const $ = id => document.getElementById(id);
+        const cartArea = $('cart-area');
+        const cartItemsList = $('cart-items');
+        const cartTotalSpan = $('cart-total');
+        const viewCartBtn = $('view-cart-btn');
+
+        const updateCartDisplay = () => {
+            cartItemsList.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                cartItemsList.innerHTML = '<li>Cart is empty.</li>';
+            } else {
+                cart.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `${item.name} x ${item.qty} - $${(item.price * item.qty).toFixed(2)}`;
+                    cartItemsList.appendChild(li);
+                    total += item.price * item.qty;
+                });
+            }
+            cartTotalSpan.textContent = `$${total.toFixed(2)}`;
+        };
+
+        $('add-to-cart-btn').addEventListener('click', () => {
+            const existing = cart.find(item => item.id === product.id);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+            localStorage.setItem('microCart', JSON.stringify(cart));
+            alert(`${product.name} added!`);
+            updateCartDisplay();
+        });
+
+        viewCartBtn.addEventListener('click', () => {
+            const isVisible = cartArea.style.display === 'block';
+            cartArea.style.display = isVisible ? 'none' : 'block';
+            viewCartBtn.textContent = isVisible ? 'View Cart' : 'Hide Cart';
+            if (!isVisible) updateCartDisplay(); 
+        });
+
+        $('checkout-btn').addEventListener('click', () => {
+            alert('Checkout not implemented in this micro version!');
+            
+        });
+
+        
+        updateCartDisplay();
+    </script>
+</body>
+</html>
